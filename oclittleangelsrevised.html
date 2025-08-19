@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OC Little Angels - Helping Youth & Communities</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-pink: #FFB6C1;
+            --primary-blue: #87CEEB;
+            --primary-yellow: #FFD700;
+            --primary-purple: #DDA0DD;
+            --text-dark: #333;
+            --white: #FFFFFF;
+            --light-bg: #FFF8F3;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--light-bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .floating-heart {
+            position: absolute;
+            animation: float 20s infinite ease-in-out;
+            filter: blur(3px);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(10deg); }
+            66% { transform: translateY(20px) rotate(-10deg); }
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--white);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-section:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-placeholder {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(221, 160, 221, 0.3);
+            animation: glow 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-upload-hint {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-purple);
+            color: var(--white);
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-section:hover .logo-upload-hint.admin-mode {
+            opacity: 1;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(221, 160, 221, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(221, 160, 221, 0.6); }
+        }
+
+        .logo-text {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 1.5rem;
+            color: var(--primary-purple);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            background: var(--primary-pink);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.4);
+        }
+
+        .admin-btn {
+            background: var(--primary-purple);
+            color: var(--white) !important;
+            padding: 0.5rem 1.5rem !important;
+            box-shadow: 0 4px 15px rgba(221, 160, 221, 0.3);
+        }
+
+        .admin-btn:hover {
+            background: var(--primary-pink) !important;
+            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.5);
+        }
+
+        /* Page Sections */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-pink);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 182, 193, 0.6);
+        }
+
+        .btn-secondary {
+            background: var(--primary-blue);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.6);
+        }
+
+        /* Cards */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 350px;
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-content p {
+            flex: 1;
+            margin-bottom: 1rem;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-pink) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::before {
+            opacity: 0.1;
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: wiggle 2s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .card h3 {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 1.8rem;
+            color: var(--primary-purple);
+            margin-bottom: 1rem;
+        }
+
+        .card .btn {
+            align-self: flex-start;
+            margin-top: auto;
+        }
+
+        /* Posts Grid */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .post-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        .post-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-content {
+            padding: 1.5rem;
+        }
+
+        .post-date {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-content h3 {
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+        }
+
+        .post-content p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .post-category {
+            background: var(--primary-pink);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        /* Modal for expanded posts */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-dark);
+            background: var(--white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+            background: var(--primary-pink);
+            color: var(--white);
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-family: 'Bubblegum Sans', cursive;
+            color: var(--primary-purple);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .modal-body {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        /* Forms */
+        .form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.2);
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-purple);
+            color: var(--white);
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .social-links a {
+            color: var(--white);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px) scale(1.2);
+        }
+
+        .social-links i {
+            font-size: 1.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .nav-links a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .form-container {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .modal-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .modal-image {
+                height: 250px;
+            }
+
+            .admin-panel {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            footer {
+                padding: 2rem 1rem;
+            }
+
+            .social-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 182, 193, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-pink);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-heart" style="top: 10%; left: 10%; color: var(--primary-pink); font-size: 30px;">💖</div>
+        <div class="floating-heart" style="top: 60%; left: 80%; color: var(--primary-blue); font-size: 25px; animation-delay: -5s;">⭐</div>
+        <div class="floating-heart" style="top: 30%; left: 60%; color: var(--primary-yellow); font-size: 35px; animation-delay: -10s;">✨</div>
+        <div class="floating-heart" style="top: 80%; left: 20%; color: var(--primary-purple); font-size: 28px; animation-delay: -15s;">🌟</div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo-section" onclick="showPage('home')">
+                <div class="logo-placeholder" id="logoContainer">
+                    👼
+                    <div class="logo-upload-hint" id="logoHint">Click to upload logo</div>
+                </div>
+                <div class="logo-text">OC Little Angels</div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showPage('home')">Home</a></li>
+                <li><a href="#" onclick="showPage('about')">About</a></li>
+                <li><a href="#" onclick="showPage('programs')">Programs</a></li>
+                <li><a href="#" onclick="showPage('involved')">Get Involved</a></li>
+                <li><a href="#" onclick="showPage('contact')">Contact</a></li>
+                <li><a href="#" onclick="showPage('admin')" class="admin-btn">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Post Modal -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home" class="page-section active">
+        <div class="hero">
+            <h1>Orange County Little Angels</h1>
+            <p>Dedicating our hearts to youth facing health challenges & marginalized communities</p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="showPage('involved')">Join Our Mission</button>
+                <button class="btn btn-secondary" onclick="showPage('programs')">Our Programs</button>
+            </div>
+        </div>
+
+        <div class="cards-container">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">📚</div>
+                    <h3>Book Drives</h3>
+                    <p>Donating new books to Children's Hospital of Orange County, spreading joy through the power of reading and imagination.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🎁</div>
+                    <h3>Community Outreach</h3>
+                    <p>Organizing donation drives and events to support families in need throughout Orange County.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">💝</div>
+                    <h3>Youth Support</h3>
+                    <p>Creating programs and initiatives specifically designed to help young people facing health challenges.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <h2 style="text-align: center; color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; margin-bottom: 1.5rem;">Recent Updates</h2>
+            <div id="postsContainer" class="posts-grid">
+                <!-- Posts will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div id="about" class="page-section">
+        <div class="hero">
+            <h1>About OC Little Angels</h1>
+            <p>Making a difference, one smile at a time</p>
+        </div>
+
+        <div class="form-container">
+            <h2 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive;">Our Story</h2>
+            <p style="line-height: 1.8; margin: 1rem 0;">
+                Orange County Little Angels was founded by Elie Nguyen with a simple yet powerful mission: to bring hope and support to youth facing health challenges and marginalized communities throughout Orange County.
+            </p>
+            <p style="line-height: 1.8; margin: 1rem 0;">
+               add more bio here... explain goals etc.
+            
+            <h3 style="color: var(--primary-purple); margin-top: 2rem;">Our Founder</h3>
+            <p style="line-height: 1.8; margin: 1rem 0;">
+                Elie Nguyen (@eliennguyenn) started OC Little Angels with a vision to create a more compassionate and inclusive Orange County. Her dedication to serving youth and families has inspired many to join our mission.
+            </p>
+
+            <div style="background: var(--light-bg); padding: 1.5rem; border-radius: 15px; margin-top: 2rem;">
+                <h3 style="color: var(--primary-pink); margin-bottom: 1rem;">Our Values</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.5rem 0;">💖 Compassion for all</li>
+                    <li style="padding: 0.5rem 0;">🌟 Community empowerment</li>
+                    <li style="padding: 0.5rem 0;">🤝 Inclusive support</li>
+                    <li style="padding: 0.5rem 0;">✨ Youth-focused initiatives</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programs Page -->
+    <div id="programs" class="page-section">
+        <div class="hero">
+            <h1>Our Programs</h1>
+            <p>Creating positive change through action</p>
+        </div>
+
+        <div class="cards-container">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">📖</div>
+                    <h3>Book Donation Drives</h3>
+                    <p>Regular book drives to collect and donate new books to Children's Hospital of Orange County (CHOC). We believe in the healing power of stories and imagination.</p>
+                    <button class="btn btn-primary" onclick="showProgramDetails('book-drives')">Learn More</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🎒</div>
+                    <h3>tbd</h3>
+                    <p>tbd</p>
+                    <button class="btn btn-primary" onclick="showProgramDetails('school-supplies')">Learn More</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🍎</div>
+                    <h3>tbd</h3>
+                    <p>tbd</p>
+                    <button class="btn btn-primary" onclick="showProgramDetails('food-drives')">Learn More</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🎨</div>
+                    <h3>tbd</h3>
+                    <p>tbd</p>
+                    <button class="btn btn-primary" onclick="showProgramDetails('art-wellness')">Learn More</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🏥</div>
+                    <h3>tbd</h3>
+                    <p>tbd</p>
+                    <button class="btn btn-primary" onclick="showProgramDetails('hospital-support')">Learn More</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🌈</div>
+                    <h3>tbd</h3>
+                    <p>tbd</p>
+                    <button class="btn btn-primary" onclick="showProgramDetails('special-events')">Learn More</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Get Involved Page -->
+    <div id="involved" class="page-section">
+        <div class="hero">
+            <h1>Get Involved</h1>
+            <p>Join us in making Orange County a better place for all</p>
+        </div>
+
+        <div class="form-container">
+            <h2 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; text-align: center;">Become a Little Angel</h2>
+            
+            <form id="volunteerForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="interest">Area of Interest</label>
+                    <select id="interest" name="interest">
+                        <option value="">Select an area</option>
+                        <option value="book-drives">Book Drives</option>
+                        <option value="food-drives">Food Drives</option>
+                        <option value="events">Special Events</option>
+                        <option value="admin">Administrative Support</option>
+                        <option value="fundraising">Fundraising</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Tell us about yourself</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Why do you want to join OC Little Angels?"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Application</button>
+            </form>
+        </div>
+
+        <div class="cards-container" style="margin-top: 3rem;">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🙋</div>
+                    <h3>Volunteer</h3>
+                    <p>Join our team of dedicated volunteers and make a direct impact in your community.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">💰</div>
+                    <h3>Donate</h3>
+                    <p>Your financial support helps us expand our programs and reach more families in need.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-icon">🤝</div>
+                    <h3>Partner</h3>
+                    <p>Partner with us as a business or organization to amplify our community impact.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="contact" class="page-section">
+        <div class="hero">
+            <h1>Contact Us</h1>
+            <p>We'd love to hear from you!</p>
+        </div>
+
+        <div class="form-container">
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="contactName">Your Name</label>
+                    <input type="text" id="contactName" name="contactName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">Email Address</label>
+                    <input type="email" id="contactEmail" name="contactEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactMessage">Message</label>
+                    <textarea id="contactMessage" name="contactMessage" rows="6" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+            </form>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <h3 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive;">Connect With Us</h3>
+                <p style="margin: 1rem 0;">Follow us on Instagram for updates and stories</p>
+                <a href="https://www.instagram.com/oclittleangels/" target="_blank" class="btn btn-secondary">
+                    @oclittleangels
+                </a>
+                
+                <div style="margin-top: 2rem;">
+                    <p><strong>Founder:</strong> Elie Nguyen</p>
+                    <p><a href="https://www.instagram.com/eliennguyenn/" target="_blank" style="color: var(--primary-pink);">@eliennguyenn</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Page -->
+    <div id="admin" class="page-section">
+        <div class="admin-panel">
+            <div id="loginSection">
+                <h2 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; text-align: center;">Admin Login</h2>
+                <form id="loginForm" style="max-width: 400px; margin: 2rem auto;">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+            </div>
+
+            <div id="adminDashboard" class="hidden">
+                <div class="admin-header">
+                    <h2 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive;">Admin Dashboard</h2>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3>Create New Post</h3>
+                    <form id="postForm">
+                        <div class="form-group">
+                            <label for="postTitle">Post Title</label>
+                            <input type="text" id="postTitle" name="postTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postImage">Post Image</label>
+                            <input type="file" id="postImage" name="postImage" accept="image/*">
+                            <div id="imagePreview" style="margin-top: 1rem;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="postContent">Content</label>
+                            <textarea id="postContent" name="postContent" rows="6" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="postCategory">Category</label>
+                            <select id="postCategory" name="postCategory">
+                                <option value="update">Update</option>
+                                <option value="event">Event</option>
+                                <option value="donation">Donation Drive</option>
+                                <option value="success">Success Story</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Publish Post</button>
+                    </form>
+                </div>
+
+                <div>
+                    <h3>Recent Posts</h3>
+                    <div id="adminPostsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3 style="font-family: 'Bubblegum Sans', cursive; font-size: 2rem; margin-bottom: 1rem;">OC Little Angels</h3>
+            <p>Making Orange County a better place, one act of kindness at a time</p>
+            <div class="social-links">
+                <a href="https://www.instagram.com/oclittleangels/" target="_blank">
+                    <i class="fab fa-instagram"></i> Instagram
+                </a>
+                <a href="#" onclick="showPage('contact')">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+                <a href="#" onclick="showPage('involved')">
+                    <i class="fas fa-heart"></i> Donate
+                </a>
+            </div>
+            <p style="margin-top: 2rem; opacity: 0.8;">© 2025 Orange County Little Angels. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Page Navigation
+        function showPage(pageId) {
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Admin Authentication (Simple demo version)
+        let isLoggedIn = false;
+        const ADMIN_USER = 'admin';
+        const ADMIN_PASS = 'littleangels2024';
+
+        // Posts Storage (using localStorage for demo)
+        let posts = JSON.parse(localStorage.getItem('ocla_posts') || '[]');
+
+        // Initialize sample posts if none exist
+        if (posts.length === 0) {
+            posts = [
+                {
+                    id: 1,
+                    title: "Book Drive Success at CHOC!",
+                    content: "We delivered over 500 books to Children's Hospital of Orange County this week! Thank you to all our amazing volunteers who made this possible. The children's faces lit up when they received their new books, and we couldn't be more grateful for your support.",
+                    category: "success",
+                    date: new Date().toISOString(),
+                    emoji: "📚",
+                    image: null
+                },
+                {
+                    id: 2,
+                    title: "Join Our Holiday Donation Drive",
+                    content: "Help us spread joy this holiday season! We're collecting toys, books, and warm clothes for families in need. Drop off locations are available throughout Orange County. Every donation makes a difference in a child's life.",
+                    category: "event",
+                    date: new Date().toISOString(),
+                    emoji: "🎁",
+                    image: null
+                }
+            ];
+            localStorage.setItem('ocla_posts', JSON.stringify(posts));
+        }
+
+        // Display posts
+        function displayPosts() {
+            const container = document.getElementById('postsContainer');
+            if (container) {
+                container.innerHTML = posts.slice(0, 6).map(post => `
+                    <div class="post-card" onclick="openPostModal(${post.id})">
+                        <div class="post-image">
+                            ${post.image ? `<img src="${post.image}" alt="${post.title}">` : post.emoji || '✨'}
+                        </div>
+                        <div class="post-content">
+                            <div class="post-date">${new Date(post.date).toLocaleDateString()}</div>
+                            <h3>${post.title}</h3>
+                            <p>${post.content.substring(0, 100)}...</p>
+                            <span class="post-category">${post.category}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Open post modal
+        function openPostModal(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="modal-image">
+                    ${post.image ? `<img src="${post.image}" alt="${post.title}">` : post.emoji || '✨'}
+                </div>
+                <div class="modal-header">
+                    <h2>${post.title}</h2>
+                    <div class="modal-meta">
+                        <span>${new Date(post.date).toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}</span>
+                        <span>•</span>
+                        <span class="post-category">${post.category}</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <p>${post.content}</p>
+                </div>
+            `;
+
+            document.getElementById('postModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('postModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('postModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Admin functions
+        document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === ADMIN_USER && password === ADMIN_PASS) {
+                isLoggedIn = true;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                document.getElementById('logoHint').classList.add('admin-mode');
+                displayAdminPosts();
+                alert('Login successful!');
+            } else {
+                alert('Invalid credentials. Please try again.');
+            }
+        });
+
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('logoHint').classList.remove('admin-mode');
+            document.getElementById('loginForm').reset();
+        }
+
+        // Image preview for post
+        document.getElementById('postImage')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').innerHTML = 
+                        `<img src="${e.target.result}" style="max-width: 200px; border-radius: 10px;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Create post with image
+        document.getElementById('postForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const imageFile = document.getElementById('postImage').files[0];
+            const processPost = (imageUrl) => {
+                const newPost = {
+                    id: Date.now(),
+                    title: document.getElementById('postTitle').value,
+                    content: document.getElementById('postContent').value,
+                    category: document.getElementById('postCategory').value,
+                    date: new Date().toISOString(),
+                    emoji: getCategoryEmoji(document.getElementById('postCategory').value),
+                    image: imageUrl
+                };
+                
+                posts.unshift(newPost);
+                localStorage.setItem('ocla_posts', JSON.stringify(posts));
+                
+                alert('Post published successfully!');
+                document.getElementById('postForm').reset();
+                document.getElementById('imagePreview').innerHTML = '';
+                displayPosts();
+                displayAdminPosts();
+            };
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    processPost(e.target.result);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                processPost(null);
+            }
+        });
+
+        function getCategoryEmoji(category) {
+            const emojis = {
+                'update': '📢',
+                'event': '🎉',
+                'donation': '🎁',
+                'success': '🌟'
+            };
+            return emojis[category] || '✨';
+        }
+
+        function displayAdminPosts() {
+            const container = document.getElementById('adminPostsList');
+            if (container && isLoggedIn) {
+                container.innerHTML = posts.map(post => `
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <h4>${post.title}</h4>
+                                <p style="color: #666; font-size: 0.9rem;">${new Date(post.date).toLocaleDateString()}</p>
+                                <p>${post.content.substring(0, 100)}...</p>
+                            </div>
+                            <button class="btn btn-secondary" onclick="deletePost(${post.id})" style="padding: 0.5rem 1rem;">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function deletePost(id) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                posts = posts.filter(post => post.id !== id);
+                localStorage.setItem('ocla_posts', JSON.stringify(posts));
+                displayPosts();
+                displayAdminPosts();
+            }
+        }
+
+        // Program details
+        function showProgramDetails(program) {
+            const details = {
+                'book-drives': {
+                    title: 'Book Donation Drives',
+                    content: 'Our book drives have collected over 10,000 books for children in hospitals and underserved communities. We partner with local schools, libraries, and bookstores to gather new and gently used books. Each book brings hope and imagination to a child in need.'
+                },
+                'school-supplies': {
+                    title: 'tbd',
+                    content: 'tbd'
+                },
+                'food-drives': {
+                    title: 'tbd',
+                    content: 'tbd'
+                },               
+                'art-wellness': {
+                    title: 'tbd',
+                    content: 'tbd'
+                },  
+                'hospital-support': {
+                    title: 'tbd',
+                    content: 'tbd'
+                },  
+                'special-events': {
+                    title: 'tbd',
+                    content: 'tbd'
+                },  
+            };
+
+            const program_info = details[program];
+            if (program_info) {
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = `
+                    <div class="modal-header">
+                        <h2>${program_info.title}</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>${program_info.content}</p>
+                        <div style="margin-top: 2rem;">
+                            <button class="btn btn-primary" onclick="showPage('involved')">Get Involved</button>
+                            <button class="btn btn-secondary" onclick="showPage('contact')">Learn More</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('postModal').classList.add('active');
+            }
+        }
+
+        // Form submissions
+        document.getElementById('volunteerForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your interest in volunteering! We will contact you soon.');
+            this.reset();
+        });
+
+        document.getElementById('contactForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! We will get back to you shortly.');
+            this.reset();
+        });
+
+        // Logo upload functionality
+        document.getElementById('logoContainer')?.addEventListener('click', function() {
+            if (isLoggedIn) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            document.getElementById('logoContainer').innerHTML = 
+                                `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                <div class="logo-upload-hint admin-mode" id="logoHint">Click to upload logo</div>`;
+                            localStorage.setItem('ocla_logo', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            }
+        });
+
+        // Load saved logo on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLogo = localStorage.getItem('ocla_logo');
+            if (savedLogo) {
+                document.getElementById('logoContainer').innerHTML = 
+                    `<img src="${savedLogo}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <div class="logo-upload-hint" id="logoHint">Click to upload logo</div>`;
+            }
+            displayPosts();
+        });
+    </script>
+</body>
+</html>
