@@ -6,6 +6,11 @@
     <title>OC Little Angels - Helping Youth & Communities</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -471,7 +476,7 @@
 
         .modal-image {
             width: 100%;
-            height: 400px;
+            max-height: 500px;
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 1.5rem;
@@ -484,8 +489,10 @@
 
         .modal-image img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            background: #fff;
         }
 
         .modal-header {
@@ -668,7 +675,7 @@
             }
 
             .modal-image {
-                height: 250px;
+                max-height: 250px;
             }
 
             .admin-panel {
@@ -719,6 +726,11 @@
             display: none !important;
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
 <body>
     <!-- Animated Background -->
@@ -734,6 +746,8 @@
         <div class="nav-container">
             <div class="logo-section" onclick="showPage('home')">
                 <div class="logo-placeholder" id="logoContainer">
+                    <!-- Replace this emoji with your logo URL -->
+                    <!-- Example: <img src="https://your-image-host.com/ocla-logo.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"> -->
                     👼
                     <div class="logo-upload-hint" id="logoHint">Click to upload logo</div>
                 </div>
@@ -814,11 +828,12 @@
                 Orange County Little Angels was founded by Elie Nguyen with a simple yet powerful mission: to bring hope and support to youth facing health challenges and marginalized communities throughout Orange County.
             </p>
             <p style="line-height: 1.8; margin: 1rem 0;">
-               add more bio here... explain goals etc.
+                What started as small acts of kindness has grown into a community-wide movement. Through book drives, donation events, and outreach programs, we're creating lasting positive impact in the lives of those who need it most.
+            </p>
             
             <h3 style="color: var(--primary-purple); margin-top: 2rem;">Our Founder</h3>
             <p style="line-height: 1.8; margin: 1rem 0;">
-                Elie Nguyen (@eliennguyenn) started OC Little Angels with a vision to create a more compassionate and inclusive Orange County. Her dedication to serving youth and families has inspired many to join our mission.
+                Elie Nguyen (@eliennguyenn) started OC Little Angels with a vision to create a more compassionate and inclusive Orange County. Her dedication to serving youth and families has inspired countless volunteers to join our mission.
             </p>
 
             <div style="background: var(--light-bg); padding: 1.5rem; border-radius: 15px; margin-top: 2rem;">
@@ -852,40 +867,40 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-icon">🎒</div>
-                    <h3>tbd</h3>
-                    <p>tbd</p>
+                    <h3>School Supply Initiative</h3>
+                    <p>Providing essential school supplies to underprivileged students, ensuring every child has the tools they need to succeed in their education.</p>
                     <button class="btn btn-primary" onclick="showProgramDetails('school-supplies')">Learn More</button>
                 </div>
             </div>
             <div class="card">
                 <div class="card-content">
                     <div class="card-icon">🍎</div>
-                    <h3>tbd</h3>
-                    <p>tbd</p>
+                    <h3>Community Food Drives</h3>
+                    <p>Organizing food drives to support local families facing food insecurity, partnering with local businesses and community centers.</p>
                     <button class="btn btn-primary" onclick="showProgramDetails('food-drives')">Learn More</button>
                 </div>
             </div>
             <div class="card">
                 <div class="card-content">
                     <div class="card-icon">🎨</div>
-                    <h3>tbd</h3>
-                    <p>tbd</p>
+                    <h3>Art & Wellness Programs</h3>
+                    <p>Creative workshops and wellness activities for youth facing health challenges, providing therapeutic outlets and building community connections.</p>
                     <button class="btn btn-primary" onclick="showProgramDetails('art-wellness')">Learn More</button>
                 </div>
             </div>
             <div class="card">
                 <div class="card-content">
                     <div class="card-icon">🏥</div>
-                    <h3>tbd</h3>
-                    <p>tbd</p>
+                    <h3>Hospital Support</h3>
+                    <p>Direct support to young patients at local hospitals through care packages, entertainment programs, and family support services.</p>
                     <button class="btn btn-primary" onclick="showProgramDetails('hospital-support')">Learn More</button>
                 </div>
             </div>
             <div class="card">
                 <div class="card-content">
                     <div class="card-icon">🌈</div>
-                    <h3>tbd</h3>
-                    <p>tbd</p>
+                    <h3>Special Events</h3>
+                    <p>Seasonal celebrations and special events bringing joy to children and families, including holiday parties and community gatherings.</p>
                     <button class="btn btn-primary" onclick="showProgramDetails('special-events')">Learn More</button>
                 </div>
             </div>
@@ -1019,8 +1034,8 @@
                 <h2 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; text-align: center;">Admin Login</h2>
                 <form id="loginForm" style="max-width: 400px; margin: 2rem auto;">
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required>
+                        <label for="username">Email Address</label>
+                        <input type="email" id="username" name="username" placeholder="admin@oclittleangels.org" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
@@ -1068,6 +1083,34 @@
                 <div>
                     <h3>Recent Posts</h3>
                     <div id="adminPostsList"></div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <h3>Recent Contact Messages</h3>
+                    <div id="adminContactsList" style="max-height: 400px; overflow-y: auto;">
+                        <p style="color: #666;">Loading messages...</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <h3>Volunteer Applications</h3>
+                    <div id="adminVolunteersList" style="max-height: 400px; overflow-y: auto;">
+                        <p style="color: #666;">Loading applications...</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <h3>Recent Contact Messages</h3>
+                    <div id="adminContactsList" style="max-height: 400px; overflow-y: auto;">
+                        <p style="color: #666;">Loading messages...</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <h3>Volunteer Applications</h3>
+                    <div id="adminVolunteersList" style="max-height: 400px; overflow-y: auto;">
+                        <p style="color: #666;">Loading applications...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1319,25 +1362,25 @@
                     content: 'Our book drives have collected over 10,000 books for children in hospitals and underserved communities. We partner with local schools, libraries, and bookstores to gather new and gently used books. Each book brings hope and imagination to a child in need.'
                 },
                 'school-supplies': {
-                    title: 'tbd',
-                    content: 'tbd'
+                    title: 'School Supply Initiative',
+                    content: 'Every child deserves the tools to succeed. Our school supply drives provide backpacks, notebooks, pencils, and other essentials to students from low-income families. We work with local schools to identify students in need and ensure they start the school year prepared.'
                 },
                 'food-drives': {
-                    title: 'tbd',
-                    content: 'tbd'
-                },               
+                    title: 'Community Food Drives',
+                    content: 'No family should go hungry. Our food drives collect non-perishable items and fresh produce for local food banks and families in need. We organize monthly drives at various locations throughout Orange County.'
+                },
                 'art-wellness': {
-                    title: 'tbd',
-                    content: 'tbd'
-                },  
+                    title: 'Art & Wellness Programs',
+                    content: 'Creative expression heals. Our art and wellness programs provide therapeutic activities for youth facing health challenges. From painting to music therapy, we offer safe spaces for children to express themselves and connect with others.'
+                },
                 'hospital-support': {
-                    title: 'tbd',
-                    content: 'tbd'
-                },  
+                    title: 'Hospital Support Services',
+                    content: 'We bring comfort to young patients and their families during difficult times. Our hospital support includes care packages, entertainment programs, and emotional support services at Children\'s Hospital of Orange County and other local medical facilities.'
+                },
                 'special-events': {
-                    title: 'tbd',
-                    content: 'tbd'
-                },  
+                    title: 'Special Events & Celebrations',
+                    content: 'Joy and celebration are essential for healing. We organize holiday parties, birthday celebrations, and special events for children who might otherwise miss out. Every child deserves to feel special and celebrated.'
+                }
             };
 
             const program_info = details[program];
