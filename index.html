@@ -914,7 +914,7 @@
 
         <div class="form-container">
             <h2 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; text-align: center;">Become a Little Angel</h2>
-            
+                        
             <form id="volunteerForm">
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
@@ -929,6 +929,11 @@
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
                     <input type="tel" id="phone" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="school">School/College</label>
+                    <input type="text" id="school" name="school" placeholder="Your school or college name">
                 </div>
                 
                 <div class="form-group">
@@ -1537,16 +1542,40 @@
                     fullName: document.getElementById('fullName').value,
                     email: document.getElementById('email').value,
                     phone: document.getElementById('phone').value,
+                    school: document.getElementById('school').value || 'Not provided',
                     interest: document.getElementById('interest').value,
                     message: document.getElementById('message').value,
                     date: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'pending'
+                    status: 'approved' // Auto-approve all applications
                 };
                 
                 // Save to Firestore
                 await db.collection('volunteers').add(volunteerData);
                 
-                alert('Thank you for your interest in volunteering! We will contact you soon with next steps.');
+                // Send to Google Sheets
+                const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTxkX1_dnkwHuAJQDOyVl5ao9IXtlq0-QvJQ3zEidHicod-niox5l65IGPydeDLDnA/exec'; // <-- PASTE YOUR URL HERE
+                
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fullName: document.getElementById('fullName').value,
+                            email: document.getElementById('email').value,
+                            phone: document.getElementById('phone').value,
+                            school: document.getElementById('school').value || 'Not provided',
+                            interest: document.getElementById('interest').value,
+                            message: document.getElementById('message').value
+                        })
+                    });
+                } catch (error) {
+                    console.log('Google Sheets logging failed, but application saved to database');
+                }
+                
+                alert('Welcome to OC Little Angels! You are now part of our volunteer team. We will contact you soon with upcoming opportunities!');
                 this.reset();
                 
             } catch (error) {
@@ -1633,14 +1662,11 @@
                             <p style="color: #666; font-size: 0.9rem;">
                                 ${data.email} • ${data.phone || 'No phone'} • ${formatDate(date)}
                             </p>
+                            <p><strong>School:</strong> ${data.school || 'Not provided'}</p>
                             <p><strong>Interest:</strong> ${data.interest}</p>
                             <p>${data.message}</p>
                             <div style="margin-top: 0.5rem;">
-                                ${data.status === 'pending' ? 
-                                    `<button class="btn btn-primary" onclick="updateVolunteerStatus('${doc.id}', 'approved')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">Approve</button>
-                                     <button class="btn btn-secondary" onclick="updateVolunteerStatus('${doc.id}', 'contacted')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem; margin-left: 0.5rem;">Mark Contacted</button>` : 
-                                    `<span style="color: #888; font-size: 0.9rem;">Status: ${data.status}</span>`
-                                }
+                                <span style="color: green; font-size: 0.9rem;">✓ Auto-Approved</span>
                             </div>
                         </div>
                     `;
