@@ -1098,20 +1098,6 @@
                         <p style="color: #666;">Loading applications...</p>
                     </div>
                 </div>
-
-                <div style="margin-top: 3rem;">
-                    <h3>Recent Contact Messages</h3>
-                    <div id="adminContactsList" style="max-height: 400px; overflow-y: auto;">
-                        <p style="color: #666;">Loading messages...</p>
-                    </div>
-                </div>
-
-                <div style="margin-top: 3rem;">
-                    <h3>Volunteer Applications</h3>
-                    <div id="adminVolunteersList" style="max-height: 400px; overflow-y: auto;">
-                        <p style="color: #666;">Loading applications...</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -1136,59 +1122,121 @@
         </div>
     </footer>
 
-    <script>
-        // Page Navigation
+        <script>
+        // ============================================
+        // FIREBASE CONFIGURATION - REPLACE WITH YOUR CONFIG
+        // ============================================
+        const firebaseConfig = {
+          apiKey: "AIzaSyCdiuEe4PDFZIMDIFp-HGP34Drfn-_tH7A",
+          authDomain: "oc-little-angels.firebaseapp.com",
+          projectId: "oc-little-angels",
+          storageBucket: "oc-little-angels.firebasestorage.app",
+          messagingSenderId: "385919057635",
+          appId: "1:385919057635:web:79941a980b170ea6d5cfd6",
+          measurementId: "G-1DG14BLRZ1"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+    
+        // ============================================
+        // AUTHENTICATION & SECURITY
+        // ============================================
+        let isLoggedIn = false;
+        let currentUser = null;
+    
+        // Monitor auth state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                isLoggedIn = true;
+                console.log('Admin logged in:', user.email);
+                document.getElementById('logoHint')?.classList.add('admin-mode');
+            } else {
+                currentUser = null;
+                isLoggedIn = false;
+                document.getElementById('logoHint')?.classList.remove('admin-mode');
+            }
+        });
+    
+        // ============================================
+        // PAGE NAVIGATION
+        // ============================================
         function showPage(pageId) {
             const sections = document.querySelectorAll('.page-section');
             sections.forEach(section => section.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
         }
-
-        // Admin Authentication (Simple demo version)
-        let isLoggedIn = false;
-        const ADMIN_USER = 'admin';
-        const ADMIN_PASS = 'littleangels2024';
-
-        // Posts Storage (using localStorage for demo)
-        let posts = JSON.parse(localStorage.getItem('ocla_posts') || '[]');
-
-        // Initialize sample posts if none exist
-        if (posts.length === 0) {
-            posts = [
-                {
-                    id: 1,
-                    title: "Book Drive Success at CHOC!",
-                    content: "We delivered over 500 books to Children's Hospital of Orange County this week! Thank you to all our amazing volunteers who made this possible. The children's faces lit up when they received their new books, and we couldn't be more grateful for your support.",
-                    category: "success",
-                    date: new Date().toISOString(),
-                    emoji: "📚",
-                    image: null
-                },
-                {
-                    id: 2,
-                    title: "Join Our Holiday Donation Drive",
-                    content: "Help us spread joy this holiday season! We're collecting toys, books, and warm clothes for families in need. Drop off locations are available throughout Orange County. Every donation makes a difference in a child's life.",
-                    category: "event",
-                    date: new Date().toISOString(),
-                    emoji: "🎁",
-                    image: null
+    
+        // ============================================
+        // POSTS MANAGEMENT WITH FIREBASE
+        // ============================================
+        let posts = [];
+    
+        // Load posts from Firebase
+        async function loadPosts() {
+            try {
+                const snapshot = await db.collection('posts')
+                    .orderBy('date', 'desc')
+                    .limit(20)
+                    .get();
+                
+                posts = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    posts.push({ 
+                        id: doc.id, 
+                        ...data,
+                        date: data.date?.toDate ? data.date.toDate() : new Date(data.date)
+                    });
+                });
+                
+                displayPosts();
+                if (isLoggedIn) {
+                    displayAdminPosts();
                 }
-            ];
-            localStorage.setItem('ocla_posts', JSON.stringify(posts));
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                // Initialize with sample posts if Firebase fails
+                if (posts.length === 0) {
+                    posts = [
+                        {
+                            id: 1,
+                            title: "Book Drive Success at CHOC!",
+                            content: "We delivered over 500 books to Children's Hospital of Orange County this week! Thank you to all our amazing volunteers who made this possible. The children's faces lit up when they received their new books, and we couldn't be more grateful for your support.",
+                            category: "success",
+                            date: new Date(),
+                            emoji: "📚",
+                            image: null
+                        },
+                        {
+                            id: 2,
+                            title: "Join Our Holiday Donation Drive",
+                            content: "Help us spread joy this holiday season! We're collecting toys, books, and warm clothes for families in need. Drop off locations are available throughout Orange County. Every donation makes a difference in a child's life.",
+                            category: "event",
+                            date: new Date(),
+                            emoji: "🎁",
+                            image: null
+                        }
+                    ];
+                    displayPosts();
+                }
+            }
         }
-
+    
         // Display posts
         function displayPosts() {
             const container = document.getElementById('postsContainer');
             if (container) {
                 container.innerHTML = posts.slice(0, 6).map(post => `
-                    <div class="post-card" onclick="openPostModal(${post.id})">
+                    <div class="post-card" onclick="openPostModal('${post.id}')">
                         <div class="post-image">
                             ${post.image ? `<img src="${post.image}" alt="${post.title}">` : post.emoji || '✨'}
                         </div>
                         <div class="post-content">
-                            <div class="post-date">${new Date(post.date).toLocaleDateString()}</div>
+                            <div class="post-date">${formatDate(post.date)}</div>
                             <h3>${post.title}</h3>
                             <p>${post.content.substring(0, 100)}...</p>
                             <span class="post-category">${post.category}</span>
@@ -1197,12 +1245,20 @@
                 `).join('');
             }
         }
-
+    
+        // Format date helper
+        function formatDate(date) {
+            if (date instanceof Date) {
+                return date.toLocaleDateString();
+            }
+            return new Date(date).toLocaleDateString();
+        }
+    
         // Open post modal
         function openPostModal(postId) {
-            const post = posts.find(p => p.id === postId);
+            const post = posts.find(p => p.id == postId);
             if (!post) return;
-
+    
             const modalContent = document.getElementById('modalContent');
             modalContent.innerHTML = `
                 <div class="modal-image">
@@ -1225,52 +1281,99 @@
                     <p>${post.content}</p>
                 </div>
             `;
-
+    
             document.getElementById('postModal').classList.add('active');
         }
-
+    
         // Close modal
         function closeModal() {
             document.getElementById('postModal').classList.remove('active');
         }
-
+    
         // Close modal when clicking outside
         document.getElementById('postModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
-
-        // Admin functions
-        document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+    
+        // ============================================
+        // ADMIN AUTHENTICATION
+        // ============================================
+        
+        // Secure login with Firebase Auth
+        document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value;
+            
+            const email = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            if (username === ADMIN_USER && password === ADMIN_PASS) {
-                isLoggedIn = true;
+            try {
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<span class="loading"></span> Logging in...';
+                submitBtn.disabled = true;
+                
+                // Authenticate with Firebase
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                
+                // Success
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
-                document.getElementById('logoHint').classList.add('admin-mode');
                 displayAdminPosts();
+                await loadAdminContacts();
+                await loadAdminVolunteers();
                 alert('Login successful!');
-            } else {
-                alert('Invalid credentials. Please try again.');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Show user-friendly error messages
+                let errorMessage = 'Login failed. Please try again.';
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'No admin account found with this email.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Please enter a valid email address.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = 'Too many failed attempts. Please try again later.';
+                }
+                
+                alert(errorMessage);
+            } finally {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = 'Login';
+                submitBtn.disabled = false;
             }
         });
-
-        function logout() {
-            isLoggedIn = false;
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('adminDashboard').classList.add('hidden');
-            document.getElementById('logoHint').classList.remove('admin-mode');
-            document.getElementById('loginForm').reset();
+    
+        // Logout function
+        async function logout() {
+            try {
+                await auth.signOut();
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('adminDashboard').classList.add('hidden');
+                document.getElementById('loginForm').reset();
+                alert('Logged out successfully');
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
         }
-
-        // Image preview for post
+    
+        // ============================================
+        // CREATE & MANAGE POSTS (Without Storage)
+        // ============================================
+    
+        // Image preview
         document.getElementById('postImage')?.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                if (file.size > 1048576) { // 1MB limit for base64
+                    alert('Image size must be less than 1MB');
+                    this.value = '';
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('imagePreview').innerHTML = 
@@ -1279,44 +1382,102 @@
                 reader.readAsDataURL(file);
             }
         });
-
-        // Create post with image
-        document.getElementById('postForm')?.addEventListener('submit', function(e) {
+    
+        // Create post with Firebase (storing image as base64)
+        document.getElementById('postForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const imageFile = document.getElementById('postImage').files[0];
-            const processPost = (imageUrl) => {
+            if (!isLoggedIn) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<span class="loading"></span> Publishing...';
+                submitBtn.disabled = true;
+                
+                let imageData = null;
+                const imageFile = document.getElementById('postImage').files[0];
+                
+                // Convert image to base64 if provided
+                if (imageFile) {
+                    const reader = new FileReader();
+                    imageData = await new Promise((resolve) => {
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(imageFile);
+                    });
+                }
+                
+                // Create post object
                 const newPost = {
-                    id: Date.now(),
                     title: document.getElementById('postTitle').value,
                     content: document.getElementById('postContent').value,
                     category: document.getElementById('postCategory').value,
-                    date: new Date().toISOString(),
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
                     emoji: getCategoryEmoji(document.getElementById('postCategory').value),
-                    image: imageUrl
+                    image: imageData,
+                    author: currentUser.email
                 };
                 
-                posts.unshift(newPost);
-                localStorage.setItem('ocla_posts', JSON.stringify(posts));
+                // Save to Firestore
+                await db.collection('posts').add(newPost);
                 
                 alert('Post published successfully!');
                 document.getElementById('postForm').reset();
                 document.getElementById('imagePreview').innerHTML = '';
-                displayPosts();
-                displayAdminPosts();
-            };
-
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    processPost(e.target.result);
-                };
-                reader.readAsDataURL(imageFile);
-            } else {
-                processPost(null);
+                
+                // Reload posts
+                await loadPosts();
+                
+            } catch (error) {
+                console.error('Error creating post:', error);
+                alert('Failed to publish post. Please try again.');
+            } finally {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = 'Publish Post';
+                submitBtn.disabled = false;
             }
         });
-
+    
+        // Display admin posts
+        function displayAdminPosts() {
+            const container = document.getElementById('adminPostsList');
+            if (container && isLoggedIn) {
+                container.innerHTML = posts.map(post => `
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <h4>${post.title}</h4>
+                                <p style="color: #666; font-size: 0.9rem;">${formatDate(post.date)}</p>
+                                <p>${post.content.substring(0, 100)}...</p>
+                            </div>
+                            <button class="btn btn-secondary" onclick="deletePost('${post.id}')" style="padding: 0.5rem 1rem;">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+    
+        // Delete post from Firebase
+        async function deletePost(id) {
+            if (!isLoggedIn) {
+                alert('Please login first');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this post?')) {
+                try {
+                    await db.collection('posts').doc(id).delete();
+                    await loadPosts();
+                    alert('Post deleted successfully');
+                } catch (error) {
+                    console.error('Error deleting post:', error);
+                    alert('Failed to delete post');
+                }
+            }
+        }
+    
         function getCategoryEmoji(category) {
             const emojis = {
                 'update': '📢',
@@ -1326,35 +1487,199 @@
             };
             return emojis[category] || '✨';
         }
-
-        function displayAdminPosts() {
-            const container = document.getElementById('adminPostsList');
-            if (container && isLoggedIn) {
-                container.innerHTML = posts.map(post => `
-                    <div class="card" style="margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div style="flex: 1;">
-                                <h4>${post.title}</h4>
-                                <p style="color: #666; font-size: 0.9rem;">${new Date(post.date).toLocaleDateString()}</p>
-                                <p>${post.content.substring(0, 100)}...</p>
-                            </div>
-                            <button class="btn btn-secondary" onclick="deletePost(${post.id})" style="padding: 0.5rem 1rem;">Delete</button>
+    
+        // ============================================
+        // CONTACT FORM - SAVES TO FIREBASE
+        // ============================================
+        document.getElementById('contactForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<span class="loading"></span> Sending...';
+                submitBtn.disabled = true;
+                
+                const contactData = {
+                    name: document.getElementById('contactName').value,
+                    email: document.getElementById('contactEmail').value,
+                    subject: document.getElementById('subject').value,
+                    message: document.getElementById('contactMessage').value,
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'unread'
+                };
+                
+                // Save to Firestore
+                await db.collection('contacts').add(contactData);
+                
+                alert('Thank you for your message! We will get back to you within 24-48 hours.');
+                this.reset();
+                
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                alert('Failed to send message. Please try again or email us directly.');
+            } finally {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = 'Send Message';
+                submitBtn.disabled = false;
+            }
+        });
+    
+        // ============================================
+        // VOLUNTEER FORM - SAVES TO FIREBASE
+        // ============================================
+        document.getElementById('volunteerForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+                submitBtn.disabled = true;
+                
+                const volunteerData = {
+                    fullName: document.getElementById('fullName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    interest: document.getElementById('interest').value,
+                    message: document.getElementById('message').value,
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending'
+                };
+                
+                // Save to Firestore
+                await db.collection('volunteers').add(volunteerData);
+                
+                alert('Thank you for your interest in volunteering! We will contact you soon with next steps.');
+                this.reset();
+                
+            } catch (error) {
+                console.error('Error submitting volunteer form:', error);
+                alert('Failed to submit application. Please try again.');
+            } finally {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = 'Submit Application';
+                submitBtn.disabled = false;
+            }
+        });
+    
+        // ============================================
+        // ADMIN DASHBOARD FUNCTIONS
+        // ============================================
+        
+        // Load contact messages for admin
+        async function loadAdminContacts() {
+            if (!isLoggedIn) return;
+            
+            try {
+                const snapshot = await db.collection('contacts')
+                    .orderBy('date', 'desc')
+                    .limit(10)
+                    .get();
+                
+                const container = document.getElementById('adminContactsList');
+                if (!container) return;
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color: #666;">No messages yet.</p>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.date?.toDate ? data.date.toDate() : new Date();
+                    html += `
+                        <div class="card" style="margin-bottom: 1rem; ${data.status === 'unread' ? 'border-left: 4px solid var(--primary-pink);' : ''}">
+                            <h4>${data.subject}</h4>
+                            <p style="color: #666; font-size: 0.9rem;">
+                                From: ${data.name} (${data.email}) • ${formatDate(date)}
+                            </p>
+                            <p>${data.message}</p>
+                            ${data.status === 'unread' ? 
+                                `<button class="btn btn-secondary" onclick="markAsRead('contacts', '${doc.id}')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">Mark as Read</button>` : 
+                                '<span style="color: #888; font-size: 0.9rem;">✓ Read</span>'
+                            }
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading contacts:', error);
             }
         }
-
-        function deletePost(id) {
-            if (confirm('Are you sure you want to delete this post?')) {
-                posts = posts.filter(post => post.id !== id);
-                localStorage.setItem('ocla_posts', JSON.stringify(posts));
-                displayPosts();
-                displayAdminPosts();
+    
+        // Load volunteer applications for admin
+        async function loadAdminVolunteers() {
+            if (!isLoggedIn) return;
+            
+            try {
+                const snapshot = await db.collection('volunteers')
+                    .orderBy('date', 'desc')
+                    .limit(10)
+                    .get();
+                
+                const container = document.getElementById('adminVolunteersList');
+                if (!container) return;
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color: #666;">No applications yet.</p>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.date?.toDate ? data.date.toDate() : new Date();
+                    html += `
+                        <div class="card" style="margin-bottom: 1rem; ${data.status === 'pending' ? 'border-left: 4px solid var(--primary-blue);' : ''}">
+                            <h4>${data.fullName}</h4>
+                            <p style="color: #666; font-size: 0.9rem;">
+                                ${data.email} • ${data.phone || 'No phone'} • ${formatDate(date)}
+                            </p>
+                            <p><strong>Interest:</strong> ${data.interest}</p>
+                            <p>${data.message}</p>
+                            <div style="margin-top: 0.5rem;">
+                                ${data.status === 'pending' ? 
+                                    `<button class="btn btn-primary" onclick="updateVolunteerStatus('${doc.id}', 'approved')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">Approve</button>
+                                     <button class="btn btn-secondary" onclick="updateVolunteerStatus('${doc.id}', 'contacted')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem; margin-left: 0.5rem;">Mark Contacted</button>` : 
+                                    `<span style="color: #888; font-size: 0.9rem;">Status: ${data.status}</span>`
+                                }
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading volunteers:', error);
             }
         }
-
-        // Program details
+    
+        // Mark message as read
+        async function markAsRead(collection, docId) {
+            try {
+                await db.collection(collection).doc(docId).update({
+                    status: 'read'
+                });
+                loadAdminContacts();
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        }
+    
+        // Update volunteer status
+        async function updateVolunteerStatus(docId, status) {
+            try {
+                await db.collection('volunteers').doc(docId).update({
+                    status: status
+                });
+                loadAdminVolunteers();
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
+        }
+    
+        // ============================================
+        // PROGRAM DETAILS
+        // ============================================
         function showProgramDetails(program) {
             const details = {
                 'book-drives': {
@@ -1382,7 +1707,7 @@
                     content: 'Joy and celebration are essential for healing. We organize holiday parties, birthday celebrations, and special events for children who might otherwise miss out. Every child deserves to feel special and celebrated.'
                 }
             };
-
+    
             const program_info = details[program];
             if (program_info) {
                 const modalContent = document.getElementById('modalContent');
@@ -1401,52 +1726,94 @@
                 document.getElementById('postModal').classList.add('active');
             }
         }
-
-        // Form submissions
-        document.getElementById('volunteerForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your interest in volunteering! We will contact you soon.');
-            this.reset();
-        });
-
-        document.getElementById('contactForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your message! We will get back to you shortly.');
-            this.reset();
-        });
-
-        // Logo upload functionality
-        document.getElementById('logoContainer')?.addEventListener('click', function() {
+    
+        // ============================================
+        // LOGO MANAGEMENT (Without Storage)
+        // ============================================
+        document.getElementById('logoContainer')?.addEventListener('click', async function() {
             if (isLoggedIn) {
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
-                input.onchange = function(e) {
+                input.onchange = async function(e) {
                     const file = e.target.files[0];
                     if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            document.getElementById('logoContainer').innerHTML = 
-                                `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                                <div class="logo-upload-hint admin-mode" id="logoHint">Click to upload logo</div>`;
-                            localStorage.setItem('ocla_logo', e.target.result);
-                        };
-                        reader.readAsDataURL(file);
+                        if (file.size > 500000) { // 500KB limit for logo
+                            alert('Logo size must be less than 500KB');
+                            return;
+                        }
+                        try {
+                            const reader = new FileReader();
+                            reader.onload = async function(e) {
+                                const logoData = e.target.result;
+                                
+                                // Save logo as base64 to Firestore
+                                await db.collection('admin').doc('settings').set({
+                                    logoData: logoData
+                                }, { merge: true });
+                                
+                                // Update UI
+                                document.getElementById('logoContainer').innerHTML = 
+                                    `<img src="${logoData}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                    <div class="logo-upload-hint admin-mode" id="logoHint">Click to upload logo</div>`;
+                                
+                                alert('Logo updated successfully!');
+                            };
+                            reader.readAsDataURL(file);
+                        } catch (error) {
+                            console.error('Error uploading logo:', error);
+                            alert('Failed to upload logo');
+                        }
                     }
                 };
                 input.click();
             }
         });
-
-        // Load saved logo on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const savedLogo = localStorage.getItem('ocla_logo');
-            if (savedLogo) {
-                document.getElementById('logoContainer').innerHTML = 
-                    `<img src="${savedLogo}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                    <div class="logo-upload-hint" id="logoHint">Click to upload logo</div>`;
+    
+        // Load logo from Firebase
+        async function loadLogo() {
+            try {
+                const doc = await db.collection('admin').doc('settings').get();
+                if (doc.exists && doc.data().logoData) {
+                    document.getElementById('logoContainer').innerHTML = 
+                        `<img src="${doc.data().logoData}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <div class="logo-upload-hint" id="logoHint">Click to upload logo</div>`;
+                }
+            } catch (error) {
+                console.error('Error loading logo:', error);
             }
-            displayPosts();
+        }
+    
+        // ============================================
+        // INITIALIZE ON PAGE LOAD
+        // ============================================
+        window.addEventListener('DOMContentLoaded', async function() {
+            // Load posts and logo
+            await loadPosts();
+            await loadLogo();
+            
+            // Check if user is already logged in
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    isLoggedIn = true;
+                    currentUser = user;
+                    
+                    // Load admin data if on admin page
+                    if (document.getElementById('adminDashboard') && !document.getElementById('adminDashboard').classList.contains('hidden')) {
+                        await loadAdminContacts();
+                        await loadAdminVolunteers();
+                    }
+                    
+                    // Auto-show admin dashboard if already logged in
+                    if (window.location.hash === '#admin') {
+                        document.getElementById('loginSection').classList.add('hidden');
+                        document.getElementById('adminDashboard').classList.remove('hidden');
+                        displayAdminPosts();
+                        await loadAdminContacts();
+                        await loadAdminVolunteers();
+                    }
+                }
+            });
         });
     </script>
 </body>
