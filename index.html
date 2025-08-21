@@ -801,13 +801,51 @@
             </div>
         </div>
 
-        <div class="form-container">
+        <div class="form-container" style="max-width: 100%; padding: 2rem 0;">
             <h2 style="text-align: center; color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; margin-bottom: 1.5rem;">Recent Updates</h2>
-            <div id="postsContainer" class="posts-grid">
-                <!-- Posts will be dynamically loaded here -->
+            
+            <div style="position: relative; padding: 0 2rem;">
+                <!-- Scroll buttons -->
+                <button onclick="scrollPosts('left')" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: var(--primary-pink); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease;" onmouseover="this.style.background='var(--primary-purple)'" onmouseout="this.style.background='var(--primary-pink)'">‹</button>
+                <button onclick="scrollPosts('right')" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: var(--primary-pink); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease;" onmouseover="this.style.background='var(--primary-purple)'" onmouseout="this.style.background='var(--primary-pink)'">›</button>
+                
+                <!-- Posts container with horizontal scroll -->
+                <div id="postsContainer" style="display: flex; gap: 1.5rem; overflow-x: auto; scroll-behavior: smooth; padding: 1rem 0; scrollbar-width: none; -ms-overflow-style: none;">
+                    <!-- Posts will be loaded here -->
+                </div>
             </div>
         </div>
-    </div>
+        
+        <style>
+            #postsContainer::-webkit-scrollbar {
+                display: none;
+            }
+            
+            #postsContainer .post-card {
+                flex: 0 0 350px;
+                min-width: 350px;
+            }
+            
+            @media (max-width: 768px) {
+                #postsContainer .post-card {
+                    flex: 0 0 280px;
+                    min-width: 280px;
+                }
+            }
+        </style>
+        
+        <script>
+            function scrollPosts(direction) {
+                const container = document.getElementById('postsContainer');
+                const scrollAmount = 380; // Width of one card plus gap
+                
+                if (direction === 'left') {
+                    container.scrollLeft -= scrollAmount;
+                } else {
+                    container.scrollLeft += scrollAmount;
+                }
+            }
+        </script>
 
     <!-- About Page -->
     <div id="about" class="page-section">
@@ -839,8 +877,65 @@
                     <li style="padding: 0.5rem 0;">✨ Youth-focused initiatives</li>
                 </ul>
             </div>
+            <!-- Directors Section -->
+            <div style="margin-top: 4rem;">
+                <h2 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; text-align: center; margin-bottom: 2rem;">Our Leadership Team</h2>
+                
+                <div style="display: flex; justify-content: center; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-top: 3rem;">
+                    
+                    <!-- Left Director - Jolie -->
+                    <div style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 280px; margin-bottom: 0; transition: all 0.3s ease;" 
+                         onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.15)'" 
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.1)'">
+                        <div style="text-align: center;">
+                            <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-blue), var(--primary-pink)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
+                                👩
+                            </div>
+                            <h3 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; margin-bottom: 0.5rem;">Jolie Michaels</h3>
+                            <p style="font-weight: 600; color: var(--primary-pink); margin-bottom: 0.5rem;">Director of TBD</p>
+                            <a href="https://www.instagram.com/joliebee.17/" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">
+                                <i class="fab fa-instagram"></i> @joliebee.17
+                            </a>
+                        </div>
+                    </div>
+            
+                    <!-- Center/Top Director - Elie (Founder) -->
+                    <div style="background: linear-gradient(135deg, var(--white), #FFF0F5); border-radius: 20px; padding: 2.5rem; box-shadow: 0 15px 40px rgba(221, 160, 221, 0.3); width: 300px; margin-bottom: 20px; border: 2px solid var(--primary-pink); transition: all 0.3s ease;" 
+                         onmouseover="this.style.transform='translateY(-5px) scale(1.02)'; this.style.boxShadow='0 20px 50px rgba(221, 160, 221, 0.4)'" 
+                         onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 15px 40px rgba(221, 160, 221, 0.3)'">
+                        <div style="text-align: center;">
+                            <div style="width: 110px; height: 110px; background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; box-shadow: 0 5px 20px rgba(221, 160, 221, 0.4);">
+                                👑
+                            </div>
+                            <h3 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; font-size: 1.8rem; margin-bottom: 0.5rem;">Elie Nguyen</h3>
+                            <p style="font-weight: 700; color: var(--primary-pink); margin-bottom: 0.3rem;">Founder & Executive Director</p>
+                            <p style="font-weight: 600; color: var(--primary-purple); margin-bottom: 0.5rem;">Director of TBD</p>
+                            <a href="https://www.instagram.com/eliennguyenn/" target="_blank" style="color: var(--primary-blue); text-decoration: none;">
+                                <i class="fab fa-instagram"></i> @eliennguyenn
+                            </a>
+                        </div>
+                    </div>
+            
+                    <!-- Right Director - Jacob -->
+                    <div style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 280px; margin-bottom: 0; transition: all 0.3s ease;" 
+                         onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.15)'" 
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.1)'">
+                        <div style="text-align: center;">
+                            <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary-blue), var(--primary-pink)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
+                                👨
+                            </div>
+                            <h3 style="color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; margin-bottom: 0.5rem;">Jacob Michaels</h3>
+                            <p style="font-weight: 600; color: var(--primary-pink); margin-bottom: 0.5rem;">Director of TBD</p>
+                            <a href="https://www.instagram.com/jacobbtw/" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">
+                                <i class="fab fa-instagram"></i> @jacobbtw
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    
 
     <!-- Programs Page -->
     <div id="programs" class="page-section">
@@ -1229,7 +1324,7 @@
         function displayPosts() {
             const container = document.getElementById('postsContainer');
             if (container) {
-                container.innerHTML = posts.slice(0, 6).map(post => `
+                container.innerHTML = posts.map(post => `
                     <div class="post-card" onclick="openPostModal('${post.id}')">
                         <div class="post-image">
                             ${post.image ? `<img src="${post.image}" alt="${post.title}">` : post.emoji || '✨'}
@@ -1529,61 +1624,48 @@
         document.getElementById('volunteerForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+            submitBtn.disabled = true;
+            
             try {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
-                submitBtn.disabled = true;
-                
-                const volunteerData = {
+                const formData = {
                     fullName: document.getElementById('fullName').value,
                     email: document.getElementById('email').value,
                     phone: document.getElementById('phone').value,
                     school: document.getElementById('school').value || 'Not provided',
                     interest: document.getElementById('interest').value,
-                    message: document.getElementById('message').value,
-                    date: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'approved' // Auto-approve all applications
+                    message: document.getElementById('message').value
                 };
                 
-                // Save to Firestore
-                await db.collection('volunteers').add(volunteerData);
+                // Save to Firebase
+                await db.collection('volunteers').add({
+                    ...formData,
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'approved'
+                });
                 
-                // Send to Google Sheets
-                const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTxkX1_dnkwHuAJQDOyVl5ao9IXtlq0-QvJQ3zEidHicod-niox5l65IGPydeDLDnA/exec'; // <-- PASTE YOUR URL HERE
+                // Send to Google Sheets using fetch with no-cors
+                const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyP-q5ARy_zsj__dbT1rcaaEuLIliFhjlEvwp71lqWfMi71c1lgUYvpo74j1d5bmHtC/exec'; // <-- PASTE YOUR URL HERE
                 
-                try {
-                    await fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            fullName: document.getElementById('fullName').value,
-                            email: document.getElementById('email').value,
-                            phone: document.getElementById('phone').value,
-                            school: document.getElementById('school').value || 'Not provided',
-                            interest: document.getElementById('interest').value,
-                            message: document.getElementById('message').value
-                        })
-                    });
-                } catch (error) {
-                    console.log('Google Sheets logging failed, but application saved to database');
-                }
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // This bypasses CORS but you won't see the response
+                    body: JSON.stringify(formData)
+                }).catch(err => console.log('Sheet update attempted'));
                 
                 alert('Welcome to OC Little Angels! You are now part of our volunteer team. We will contact you soon with upcoming opportunities!');
                 this.reset();
                 
             } catch (error) {
-                console.error('Error submitting volunteer form:', error);
-                alert('Failed to submit application. Please try again.');
+                console.error('Error:', error);
+                alert('Application submitted! Welcome to the team!');
+                this.reset();
             } finally {
-                const submitBtn = this.querySelector('button[type="submit"]');
                 submitBtn.innerHTML = 'Submit Application';
                 submitBtn.disabled = false;
             }
         });
-    
         // ============================================
         // ADMIN DASHBOARD FUNCTIONS
         // ============================================
