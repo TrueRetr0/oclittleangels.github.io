@@ -729,6 +729,14 @@
     </style>
 </head>
 <body>
+        <!-- Dynamic Event Background -->
+    <div id="dynamicBackground" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; transition: opacity 0.5s ease;">
+        <div id="backgroundImage" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(5px) brightness(0.7); transform: scale(1.1); display: none;"></div>
+        <div id="backgroundVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; overflow: hidden;">
+            <iframe id="videoFrame" style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vh; min-width: 100%; min-height: 100%; transform: translate(-50%, -50%) scale(1.5); border: none; pointer-events: none;" frameborder="0"></iframe>
+        </div>
+        <video id="directVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none;" autoplay muted loop></video>
+    </div>
     <!-- Animated Background -->
     <div class="bg-animation">
         <div class="floating-heart" style="top: 10%; left: 10%; color: var(--primary-pink); font-size: 30px;">💖</div>
@@ -1383,6 +1391,26 @@
                         <div id="eventImagePreview" style="margin-top: 1rem;"></div>
                     </div>
                     <div class="form-group">
+                        <label for="eventBackgroundType">Background Type</label>
+                        <select id="eventBackgroundType" name="eventBackgroundType" onchange="toggleBackgroundFields()">
+                            <option value="none">No Background (Use Default)</option>
+                            <option value="image">Upload Image Background</option>
+                            <option value="video">Video URL</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="backgroundImageGroup" style="display: none;">
+                        <label for="eventBackgroundImage">Background Image (will blur and fill screen)</label>
+                        <input type="file" id="eventBackgroundImage" name="eventBackgroundImage" accept="image/*">
+                        <div id="backgroundImagePreview" style="margin-top: 1rem;"></div>
+                    </div>
+                    
+                    <div class="form-group" id="backgroundVideoGroup" style="display: none;">
+                        <label for="eventBackgroundVideo">Video URL (YouTube, Vimeo, or direct MP4 link)</label>
+                        <input type="url" id="eventBackgroundVideo" name="eventBackgroundVideo" placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4">
+                        <small style="color: #666;">Supports YouTube, Vimeo, or direct video links (.mp4)</small>
+                    </div>
+                    <div class="form-group">
                         <label for="eventDescription">Short Description (shown on card)</label>
                         <textarea id="eventDescription" name="eventDescription" rows="3" required></textarea>
                     </div>
@@ -1685,6 +1713,10 @@
             ).join('');
             
             currentEventIndex = 0;
+            // Set initial background
+            if (currentEvents.length > 0) {
+                setEventBackground(currentEvents[0]);
+            }
         }
         
         // Change event in carousel
@@ -1716,6 +1748,11 @@
             indicators.forEach((indicator, index) => {
                 indicator.classList.toggle('active', index === currentEventIndex);
             });
+            
+            // Set background for current event
+            if (currentEvents[currentEventIndex]) {
+                setEventBackground(currentEvents[currentEventIndex]);
+            }
         }
         
         // Open event image modal
@@ -1980,11 +2017,14 @@
                 submitBtn.disabled = true;
                 
                 let imageData = null;
+                let backgroundImageData = null;
                 const imageFile = document.getElementById('eventImage').files[0];
+                const backgroundImageFile = document.getElementById('eventBackgroundImage').files[0];
+                const backgroundType = document.getElementById('eventBackgroundType').value;
                 
-                // Convert image to base64 if provided
+                // Convert event image to base64 if provided
                 if (imageFile) {
-                    if (imageFile.size > 1048576) { // 1MB limit
+                    if (imageFile.size > 1048576) {
                         alert('Image size must be less than 1MB');
                         return;
                     }
@@ -1992,6 +2032,19 @@
                     imageData = await new Promise((resolve) => {
                         reader.onload = (e) => resolve(e.target.result);
                         reader.readAsDataURL(imageFile);
+                    });
+                }
+                
+                // Convert background image to base64 if provided
+                if (backgroundType === 'image' && backgroundImageFile) {
+                    if (backgroundImageFile.size > 1048576) {
+                        alert('Background image size must be less than 1MB');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    backgroundImageData = await new Promise((resolve) => {
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(backgroundImageFile);
                     });
                 }
                 
@@ -2003,8 +2056,11 @@
                     description: document.getElementById('eventDescription').value,
                     fullDescription: document.getElementById('eventFullDescription').value,
                     image: imageData,
+                    backgroundType: backgroundType,
+                    backgroundImage: backgroundType === 'image' ? backgroundImageData : null,
+                    backgroundVideo: backgroundType === 'video' ? document.getElementById('eventBackgroundVideo').value : null,
                     emoji: '📅',
-                    active: true, // Always active
+                    active: true,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     author: currentUser.email
                 };
@@ -2015,6 +2071,8 @@
                 alert('Event created successfully!');
                 document.getElementById('eventForm').reset();
                 document.getElementById('eventImagePreview').innerHTML = '';
+                document.getElementById('backgroundImagePreview').innerHTML = '';
+                toggleBackgroundFields(); // Reset background fields
                 
                 // Reload events
                 await loadEvents();
@@ -2029,86 +2087,86 @@
                 submitBtn.disabled = false;
             }
         });
+
+        //BACKGROUND FRO EVENTSSS
+
+        // Toggle background fields based on selection
+        function toggleBackgroundFields() {
+            const type = document.getElementById('eventBackgroundType').value;
+            document.getElementById('backgroundImageGroup').style.display = type === 'image' ? 'block' : 'none';
+            document.getElementById('backgroundVideoGroup').style.display = type === 'video' ? 'block' : 'none';
+        }
         
-        // Event image preview
-        document.getElementById('eventImage')?.addEventListener('change', function(e) {
+        // Background image preview
+        document.getElementById('eventBackgroundImage')?.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 if (file.size > 1048576) { // 1MB limit
-                    alert('Image size must be less than 1MB');
+                    alert('Background image size must be less than 1MB');
                     this.value = '';
                     return;
                 }
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('eventImagePreview').innerHTML = 
+                    document.getElementById('backgroundImagePreview').innerHTML = 
                         `<img src="${e.target.result}" style="max-width: 200px; border-radius: 10px;">`;
                 };
                 reader.readAsDataURL(file);
             }
         });
-
-        // Load events for admin panel
-        async function loadAdminEvents() {
-            if (!isLoggedIn) return;
-            
-            try {
-                const snapshot = await db.collection('events')
-                    .orderBy('startDate', 'desc')
-                    .limit(20)
-                    .get();
-                
-                const container = document.getElementById('adminEventsList');
-                if (!container) return;
-                
-                if (snapshot.empty) {
-                    container.innerHTML = '<p style="color: #666;">No events yet.</p>';
-                    return;
-                }
-                
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const startDate = data.startDate?.toDate ? data.startDate.toDate() : new Date();
-                    const endDate = data.endDate?.toDate ? data.endDate.toDate() : new Date();
-                    html += `
-                        <div class="card" style="margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: start;">
-                                <div style="flex: 1;">
-                                    <h4>${data.title}</h4>
-                                    <p style="color: #666; font-size: 0.9rem;">
-                                        ${formatDate(startDate)} - ${formatDate(endDate)}
-                                    </p>
-                                    <p>${data.description.substring(0, 100)}...</p>
-                                </div>
-                                <button class="btn btn-secondary" onclick="deleteEvent('${doc.id}')" style="padding: 0.5rem 1rem;">Delete</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            } catch (error) {
-                console.error('Error loading admin events:', error);
-            }
-        }
         
-        // Delete event
-        async function deleteEvent(id) {
-            if (!isLoggedIn) {
-                alert('Please login first');
-                return;
-            }
+        // Set dynamic background based on current event
+        function setEventBackground(event) {
+            const bgImage = document.getElementById('backgroundImage');
+            const bgVideo = document.getElementById('backgroundVideo');
+            const directVideo = document.getElementById('directVideo');
+            const videoFrame = document.getElementById('videoFrame');
+            const animatedBg = document.querySelector('.bg-animation');
             
-            if (confirm('Are you sure you want to delete this event?')) {
-                try {
-                    await db.collection('events').doc(id).delete();
-                    await loadEvents();
-                    await loadAdminEvents();
-                    alert('Event deleted successfully');
-                } catch (error) {
-                    console.error('Error deleting event:', error);
-                    alert('Failed to delete event');
+            // Reset all backgrounds
+            bgImage.style.display = 'none';
+            bgVideo.style.display = 'none';
+            directVideo.style.display = 'none';
+            
+            if (event && event.backgroundType === 'image' && event.backgroundImage) {
+                // Show image background
+                bgImage.style.backgroundImage = `url(${event.backgroundImage})`;
+                bgImage.style.display = 'block';
+                animatedBg.style.opacity = '0';
+            } else if (event && event.backgroundType === 'video' && event.backgroundVideo) {
+                const url = event.backgroundVideo;
+                
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    // YouTube video
+                    let videoId = '';
+                    if (url.includes('youtube.com')) {
+                        videoId = url.split('v=')[1]?.split('&')[0];
+                    } else if (url.includes('youtu.be')) {
+                        videoId = url.split('youtu.be/')[1]?.split('?')[0];
+                    }
+                    
+                    if (videoId) {
+                        videoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&modestbranding=1&iv_load_policy=3&rel=0`;
+                        bgVideo.style.display = 'block';
+                        animatedBg.style.opacity = '0';
+                    }
+                } else if (url.includes('vimeo.com')) {
+                    // Vimeo video
+                    const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
+                    if (videoId) {
+                        videoFrame.src = `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&background=1`;
+                        bgVideo.style.display = 'block';
+                        animatedBg.style.opacity = '0';
+                    }
+                } else if (url.endsWith('.mp4') || url.endsWith('.webm')) {
+                    // Direct video file
+                    directVideo.src = url;
+                    directVideo.style.display = 'block';
+                    animatedBg.style.opacity = '0';
                 }
+            } else {
+                // Default animated background
+                animatedBg.style.opacity = '0.3';
             }
         }
     
