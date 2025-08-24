@@ -915,18 +915,31 @@
 
                         /* Hero text outline styles */
            /* Proper text outline for hero when background is active */
+/* Thinner, cleaner text outlines for hero with background */
             .hero-with-bg h1 {
-                text-stroke: 2px white;
-                -webkit-text-stroke: 2px white;
+                color: var(--primary-purple) !important;
+                background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: 
+                    1px 1px 0 rgba(255,255,255,0.8),
+                    -1px 1px 0 rgba(255,255,255,0.8),
+                    1px -1px 0 rgba(255,255,255,0.8),
+                    -1px -1px 0 rgba(255,255,255,0.8);
             }
             
             .hero-with-bg p {
-                text-stroke: 1px white;
-                -webkit-text-stroke: 1px white;
+                color: white !important;
+                text-shadow: 
+                    1px 1px 2px rgba(0,0,0,0.8),
+                    -1px 1px 2px rgba(0,0,0,0.8),
+                    1px -1px 2px rgba(0,0,0,0.8),
+                    -1px -1px 2px rgba(0,0,0,0.8);
             }
             
             .hero-with-bg .btn {
-                border: 2px solid white;
+                text-shadow: 
+                    1px 1px 1px rgba(0,0,0,0.5);
             }
             
             /* Event card redesign */
@@ -985,21 +998,30 @@
             }
             
             /* Staggered blurbs */
+            /* Staggered blurbs in one container */
             .blurbs-section {
                 max-width: 1200px;
                 margin: 3rem auto;
                 padding: 2rem;
             }
             
-            .blurb-item {
-                display: flex;
-                align-items: center;
-                margin-bottom: 3rem;
-                gap: 3rem;
+            .blurbs-container {
                 background: var(--white);
                 border-radius: 20px;
                 padding: 2rem;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+            
+            .blurb-item {
+                display: flex;
+                align-items: center;
+                padding: 2rem 0;
+                gap: 3rem;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            
+            .blurb-item:last-child {
+                border-bottom: none;
             }
             
             .blurb-item:nth-child(even) {
@@ -1007,8 +1029,8 @@
             }
             
             .blurb-image {
-                flex: 0 0 300px;
-                height: 200px;
+                flex: 0 0 250px;
+                height: 180px;
                 border-radius: 15px;
                 overflow: hidden;
             }
@@ -1038,6 +1060,7 @@
                 .blurb-item,
                 .blurb-item:nth-child(even) {
                     flex-direction: column;
+                    padding: 1.5rem 0;
                 }
                 
                 .blurb-image {
@@ -2346,20 +2369,24 @@
             
             if (blurbs.length === 0) return;
             
-            container.innerHTML = blurbs.map((blurb, index) => `
-                <div class="blurb-item">
-                    <div class="blurb-image">
-                        ${blurb.image ? 
-                            `<img src="${blurb.image}" alt="${blurb.title}">` : 
-                            `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 3rem;">✨</div>`
-                        }
-                    </div>
-                    <div class="blurb-content">
-                        <h3 class="blurb-title">${blurb.title}</h3>
-                        <p>${blurb.description}</p>
-                    </div>
+            container.innerHTML = `
+                <div class="blurbs-container">
+                    ${blurbs.map((blurb, index) => `
+                        <div class="blurb-item">
+                            <div class="blurb-image">
+                                ${blurb.image ? 
+                                    `<img src="${blurb.image}" alt="${blurb.title}">` : 
+                                    `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 3rem;">✨</div>`
+                                }
+                            </div>
+                            <div class="blurb-content">
+                                <h3 class="blurb-title">${blurb.title}</h3>
+                                <p>${blurb.description}</p>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
         
         function displayAdminBlurbs() {
