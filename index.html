@@ -788,7 +788,7 @@
                 <button class="btn btn-secondary" onclick="showPage('programs')">Our Programs</button>
             </div>
             <!-- Staggered Blurbs Section -->
-            <div class="blurbs-section">
+            <div class="blurbs-section" style="margin-top: 5rem;">
                 <div id="blurbsContainer">
                     <!-- Blurbs will be loaded here -->
                 </div>
@@ -818,20 +818,20 @@
                 </div>
             </div>
             <!-- Current Events Section -->
-            <div style="margin-top: 4rem; padding: 3rem 0; background: linear-gradient(135deg, rgba(255,182,193,0.1), rgba(135,206,235,0.1));">
+            <div style="margin-top: 4rem; padding: 3rem 0;">
                 <h2 style="text-align: center; color: var(--primary-purple); font-family: 'Bubblegum Sans', cursive; font-size: 2.5rem; margin-bottom: 2rem;">Current Events</h2>
                 
-                <div style="max-width: 900px; margin: 0 auto; position: relative; padding: 0 60px;">
-                    <!-- Navigation Arrows -->
-                    <button onclick="changeEvent('prev')" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: var(--primary-pink); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='var(--primary-purple)'" onmouseout="this.style.background='var(--primary-pink)'">
-                        <span style="font-size: 2rem;">‹</span>
+                <div style="position: relative;">
+                    <!-- Navigation Arrows - Now overlaying the event -->
+                    <button onclick="changeEvent('prev')" style="position: absolute; left: 30px; top: 50%; transform: translateY(-50%); background: var(--primary-pink); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; z-index: 20; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='var(--primary-purple)'" onmouseout="this.style.background='var(--primary-pink)'">
+                        <span style="font-size: 2.5rem;">‹</span>
                     </button>
-                    <button onclick="changeEvent('next')" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: var(--primary-pink); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='var(--primary-purple)'" onmouseout="this.style.background='var(--primary-pink)'">
-                        <span style="font-size: 2rem;">›</span>
+                    <button onclick="changeEvent('next')" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); background: var(--primary-pink); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; z-index: 20; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='var(--primary-purple)'" onmouseout="this.style.background='var(--primary-pink)'">
+                        <span style="font-size: 2.5rem;">›</span>
                     </button>
                     
-                    <!-- Events Carousel Container -->
-                    <div id="eventsCarousel" style="overflow: hidden; border-radius: 20px; background: var(--white);">
+                    <!-- Events Carousel Container - Full width -->
+                    <div id="eventsCarousel" style="overflow: hidden; width: 100%;">
                         <div id="eventsContainer" style="display: flex; transition: transform 0.5s ease;">
                             <!-- Events will be loaded here -->
                         </div>
@@ -946,16 +946,14 @@
             .event-card-new {
                 position: relative;
                 width: 100%;
-                min-height: 400px;
-                border-radius: 20px;
+                min-height: 500px;
                 overflow: hidden;
-                background: var(--white);
             }
             
             .event-card-media {
                 position: relative;
                 width: 100%;
-                height: 400px;
+                height: 500px;
                 overflow: hidden;
             }
             
@@ -965,63 +963,61 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+                background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                padding: 2rem;
+                padding: 3rem;
                 text-align: center;
             }
             
             .event-card-title-new {
                 font-family: 'Bubblegum Sans', cursive;
-                font-size: 3rem;
+                font-size: 4rem;
                 color: white;
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
                 text-shadow: 
                     2px 2px 4px rgba(0, 0, 0, 0.8),
-                    -2px 2px 4px rgba(0, 0, 0, 0.8),
-                    2px -2px 4px rgba(0, 0, 0, 0.8),
-                    -2px -2px 4px rgba(0, 0, 0, 0.8);
+                    -2px 2px 4px rgba(0, 0, 0, 0.8);
             }
             
             .event-card-date-new {
-                font-size: 1.2rem;
+                font-size: 1.5rem;
                 color: white;
-                margin-bottom: 2rem;
+                margin-bottom: 2.5rem;
                 text-shadow: 
-                    2px 2px 4px rgba(0, 0, 0, 0.8),
-                    -2px 2px 4px rgba(0, 0, 0, 0.8),
-                    2px -2px 4px rgba(0, 0, 0, 0.8),
-                    -2px -2px 4px rgba(0, 0, 0, 0.8);
+                    2px 2px 4px rgba(0, 0, 0, 0.8);
+            }
+            
+            @media (max-width: 768px) {
+                .event-card-title-new {
+                    font-size: 2.5rem;
+                }
+                
+                .event-card-media {
+                    height: 400px;
+                }
             }
             
             /* Staggered blurbs */
             /* Staggered blurbs in one container */
+/* Staggered blurbs */
             .blurbs-section {
                 max-width: 1200px;
                 margin: 3rem auto;
                 padding: 2rem;
             }
             
-            .blurbs-container {
-                background: var(--white);
-                border-radius: 20px;
-                padding: 2rem;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            }
-            
             .blurb-item {
                 display: flex;
                 align-items: center;
-                padding: 2rem 0;
+                padding: 2rem;
                 gap: 3rem;
-                border-bottom: 1px solid #f0f0f0;
-            }
-            
-            .blurb-item:last-child {
-                border-bottom: none;
+                margin-bottom: 2rem;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 20px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.05);
             }
             
             .blurb-item:nth-child(even) {
@@ -1051,24 +1047,6 @@
                 color: var(--primary-purple);
                 margin-bottom: 1rem;
             }
-            
-            @media (max-width: 768px) {
-                .event-card-title-new {
-                    font-size: 2rem;
-                }
-                
-                .blurb-item,
-                .blurb-item:nth-child(even) {
-                    flex-direction: column;
-                    padding: 1.5rem 0;
-                }
-                
-                .blurb-image {
-                    flex: none;
-                    width: 100%;
-                }
-            }
-
                         /* Current Events Styles */
             .event-card {
                 background: var(--white);
@@ -2369,24 +2347,20 @@
             
             if (blurbs.length === 0) return;
             
-            container.innerHTML = `
-                <div class="blurbs-container">
-                    ${blurbs.map((blurb, index) => `
-                        <div class="blurb-item">
-                            <div class="blurb-image">
-                                ${blurb.image ? 
-                                    `<img src="${blurb.image}" alt="${blurb.title}">` : 
-                                    `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 3rem;">✨</div>`
-                                }
-                            </div>
-                            <div class="blurb-content">
-                                <h3 class="blurb-title">${blurb.title}</h3>
-                                <p>${blurb.description}</p>
-                            </div>
-                        </div>
-                    `).join('')}
+            container.innerHTML = blurbs.map((blurb, index) => `
+                <div class="blurb-item">
+                    <div class="blurb-image">
+                        ${blurb.image ? 
+                            `<img src="${blurb.image}" alt="${blurb.title}">` : 
+                            `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 3rem;">✨</div>`
+                        }
+                    </div>
+                    <div class="blurb-content">
+                        <h3 class="blurb-title">${blurb.title}</h3>
+                        <p>${blurb.description}</p>
+                    </div>
                 </div>
-            `;
+            `).join('');
         }
         
         function displayAdminBlurbs() {
